@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>Почта</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+	<style>
+		.cp {cursor:pointer;}
+	</style>
+</head>
+<body>
+<div id="apps">
+  <mail-item v-if="selected" :mail="selected" @close="selected = null"></mail-item>
+  <mail-list v-else :mail="mail" @select="selected = $event"></mail-list>
+
+</div>
+<template id="mail-item">
+  <div>
+    <button @click="$emit('close')">Назад</button>
+    <div v-for="(val, key) in mail">
+		{{ val }} - {{ key }}
+    </div>
+	<hello></hello>
+  </div>
+</template>
+
+<template id="mail-list">
+  <table class="table table-hover">
+    <tr v-for="n in mail" :id="n.id" @click="$emit('select', n)" class="cp">
+      <td>{{ n.id }}</td>
+      <td>{{ n.text }}</td>
+      <td>{{ n.date }}</td>
+    </tr>
+  </table>
+</template>
+  
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+	<script>
+            Vue.component('hello', {
+                template: '<textarea style="width:100%;" rows="6"></textarea>'
+            });
+            var app = new Vue({
+                el: '#apps',
+                    data: {
+                    selected: null,
+                    mail: [
+                        {id: 1, text: 'Изучить этот JavaScript', date: '22.09.2018 в 11:00'},
+                        {id: 2, text: 'Изучить Vue', date: '22.10.2019 в 12:02'},
+                        {id: 3, text: 'Создать что-нибудь классное', date: '15.11.2019 в 11:22'},
+                        {id: 4, text: 'Новое сообщение от Эмили', date: '22.12.2019 в 21:07'}
+                    ]
+                },
+                components: {
+                    mailItem: {
+                        template: '#mail-item',
+                        props: [ 'mail' ]
+                    },
+                    mailList: {
+                        template: '#mail-list',
+                        props: [ 'mail' ]
+                    }
+                }
+            });
+	</script>
+</body>
+</html>
