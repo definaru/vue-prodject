@@ -3,56 +3,145 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-	<title>Mail | Inbox</title>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-	<style>
-		.cp        {cursor:pointer;}
-    span       {cursor:pointer;}
-    span:hover {cursor:pointer;text-decoration: underline;}
-	</style>
+    <title>Почта</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://glyphsearch.com/bower_components/foundation-icon-fonts/foundation-icons.css">
+    <link rel="stylesheet" href="https://glyphsearch.com/bower_components/ionicons/css/ionicons.css">
+    <style>
+        .cp {cursor:pointer;}
+    </style>
 </head>
 <body>
     <div id="apps">
-        <lists v-if="selectedUsers==''">
-            <table class="table table-hover">
-              <tr class="cp" v-for="user in users">
-                <td><label><input type="checkbox" v-bind:value="user" v-model="selectedUsers" class="mr-5"> <span>{{user.name}}</span></label></td>
-                <td><label><input type="checkbox" v-bind:value="user" class="d-none" v-model="selectedUsers" class="mr-5"> <span>{{user.text}}</span></label></td>
-                <td>{{ user.date }}</td>                  
-              </tr>
-            </table>       
-        </lists>
-        <lists v-else></lists>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-4 p-0">
+                    <table class="table table-hover">
+                        <tr v-for="(n, index) in mails" class="cp" :class="{'table-active': selectMailCell === index}">
+                            <td>
+                                <input class="form-check-input ml-1" type="checkbox">
+                            </td>
+                            <td @click="selectMail(index), inbox = false, isActive = true">
+                                <small class="font-weight-bold" :class="{'font-weight-normal': isActive === index}">{{ n.text }}</small>
+                            </td>
+                            <td @click="selectMail(index), inbox = false"><small class="text-muted float-right">{{ n.date }}</small></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-8 p-0">
+                    <div class="border" style="height: 100vh !important;">
+                        
+                        
+                        <template v-if="inbox">
+                            <div class="p-3">
+<form>
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text">От кого:</span>
+        </div>
+        <input type="text" class="form-control" placeholder="Адрес отправителя" value="info@defina.ru">
+    </div>
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text">&#160;&#160;&#160; Кому:</span>
+        </div>
+        <input type="text" class="form-control" placeholder="Адрес получателя" :value="mail.email">
+    </div>
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text">&#160;&#160;&#160; Тема:</span>
+        </div>
+        <input type="text" class="form-control" placeholder="Тема письма">
+    </div>
+    <div class="input-group mb-3">
+        <textarea class="form-control" rows="6"></textarea>
+    </div>
+    <button type="button" class="btn btn-warning"><i class="ionicons ion-android-share"></i> Отправить</button>
+    <button @click="inbox = false" class="btn btn-outline-danger">
+        <i class="fi-x"></i> Отмена
+    </button>
+</form>
+                            </div>
+                        </template>
+                        
+                        <template v-else>
+<div class="btn-group btn-group-lg float-right">
+    <button type="button" class="btn btn-default"><i class="ionicons ion-android-star-outline"></i></button>
+    <button type="button" class="btn btn-default"><i class="ionicons ion-android-share"></i></button>
+    <div class="btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            <i class="ionicons ion-android-more-vertical"></i>
+        </button>
+        <div class="dropdown-menu dropdown-menu-right">
+            <a class="dropdown-item" href="#">Tablet</a>
+            <a class="dropdown-item" href="#">Smartphone</a>
+        </div>
+    </div>
+</div>                            
+<h6 class="pt-3 pl-3 pr-3 pb-0">{{ mail.text }} 
+    &#160; <i class="fi-mail text-primary"></i> &#160; 
+    <span class="badge badge-light">Входящие <i class="ionicons ion-android-close"></i></span></h6>
+                            
 
-
-        <div v-for="user in selectedUsers">
-            <label class="btn btn-danger cp"><input type="checkbox" v-bind:value="user" class="d-none" v-model="selectedUsers" checked=""> Назад</label>
-            <div class="media border p-3 mb-3">
-                <img src="http://rm.host/img/photo.png" :alt="user.name" class="mr-3 mt-0 rounded-circle" style="width:60px;">
-                <div class="media-body">
-                    <h4>{{user.name}} <small><i>{{user.date}}</i></small></h4>
-                    <p>{{ user.text }}</p>
+                            
+                            <div class="media pt-3 pl-3 pr-3 pb-0">
+                                <img :src="mail.avatar" :alt="mail.name" class="mr-3 mt-0 rounded-circle" style="width:60px;">
+                                <div class="media-body">
+                                    <h4>{{ mail.name }} <small><{{ mail.email }}></small> &#160; <i class="fi-print cp" onclick="window.print()"></i> &#160; <i class="ionicons ion-android-open"></i></h4>
+                                    <small class="text-muted"><i class="fi-clock"></i> <i>{{ mail.date }}</i></small>
+                                </div>
+                            </div>
+                            <div class="d-block btn-block p-3">
+                                <span v-html="mail.message"></span>
+                                <hr/>
+                                <button @click="inbox = true" class="btn btn-outline-light text-dark">
+                                    <i class="ionicons ion-android-share"></i> ответить
+                                </button>
+                                <button class="btn btn-outline-light text-dark">
+                                    <i class="fi-arrow-right"></i> переслать
+                                </button>
+                            </div>                             
+                        </template>
+                    </div>
                 </div>
             </div>
         </div>
-        
     </div>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
     <script>
-        var app = new Vue({
+        const mail = (id, email, avatar, name, text, message, date) => ({id, email, avatar, name, text, message, date});
+        const mails = [
+            mail(1, 'java@gmail.com', 'https://www.w3schools.com/bootstrap4/img_avatar1.png', 'Java Script', 'Изучить этот JavaScript', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', '22.09.2018 в 11:00'),
+            mail(2, 'vue@gmail.com', 'https://www.w3schools.com/bootstrap4/img_avatar2.png', 'Vue JS', 'Изучить Vue', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', '22.10.2019 в 12:02'),
+            mail(3, 'music@yandex.ru', 'https://www.w3schools.com/bootstrap4/img_avatar3.png', 'Classic Music', 'Создать что-нибудь классное', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', '15.11.2019 в 11:22'),
+            mail(4, 'emily@yandex.ru', 'https://www.w3schools.com/bootstrap4/img_avatar4.png', 'Эмили Стоун', 'Новое сообщение от Эмили', '<b>Consectetur adipiscing elit</b>, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', '22.12.2019 в 21:07'),
+            mail(4, 'lloy-iver@yandex.ru', 'https://www.w3schools.com/bootstrap4/img_avatar4.png', 'Кристин Ллоу', 'Новое сообщение от Кристин', '<b>Consectetur adipiscing elit</b>, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', '23.12.2020 в 20:00')
+        ];
+        
+        new Vue({
             el: '#apps',
             data: {
-                users:[
-                    {id: 1, name:'Tom Rider',  text: 'Изучить этот JavaScript', date: '22.09.2018 в 11:00'},
-                    {id: 2, name:'Bob Marley', text: 'Изучить Vue', date: '22.10.2019 в 12:02'},
-                    {id: 3, name:'Sam Dikson', text: 'Создать что-нибудь классное', date: '15.11.2019 в 11:22'},
-                    {id: 4, name:'Alice Brick', text: 'Новое сообщение от Эмили', date: '22.12.2019 в 21:07'}
-                ],
-                selectedUsers:[]
+                mails: mails,
+                mail: mails[0],
+                selectMailCell: null,
+                inbox: false,
+                isActive: false
+            },
+            methods: {
+                selectMail: function(index)
+                {
+                    this.mail = mails[index],
+                    this.selectMailCell = index,
+                    this.isActive = index
+                }
             }
+//            components: {
+//
+//            }
         });
     </script>
 </body>
