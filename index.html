@@ -9,15 +9,30 @@
     <link rel="stylesheet" href="https://glyphsearch.com/bower_components/ionicons/css/ionicons.css">
     <style>
         .cp {cursor:pointer;}
+        .dropdown-toggle::after {display: none;}
+        .btn.focus, .btn:focus {
+            outline: 0;
+            box-shadow: none;
+        }
     </style>
 </head>
 <body>
     <div id="apps">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-4 p-0">
+                <div class="col-md-12 p-0">
+  <div class="input-group d-print-none">
+    <div class="input-group-prepend">
+      <span class="input-group-text"><i class="fi-magnifying-glass"></i></span>
+    </div>
+    <input type="search" class="form-control" placeholder="Поиск писем" v-model="searth">
+  </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 p-0 d-print-none">
                     <table class="table table-hover">
-                        <tr v-for="(n, index) in mails" class="cp" :class="{'table-active': selectMailCell === index}">
+                        <tr v-for="(n, index) in filtredMail" class="cp" :class="{'table-active': selectMailCell === index}">
                             <td>
                                 <input class="form-check-input ml-1" type="checkbox">
                             </td>
@@ -34,50 +49,50 @@
                         
                         <template v-if="inbox">
                             <div class="p-3">
-<form>
-    <div class="input-group mb-3">
-        <div class="input-group-prepend">
-            <span class="input-group-text">От кого:</span>
-        </div>
-        <input type="text" class="form-control" placeholder="Адрес отправителя" value="info@defina.ru">
-    </div>
-    <div class="input-group mb-3">
-        <div class="input-group-prepend">
-            <span class="input-group-text">&#160;&#160;&#160; Кому:</span>
-        </div>
-        <input type="text" class="form-control" placeholder="Адрес получателя" :value="mail.email">
-    </div>
-    <div class="input-group mb-3">
-        <div class="input-group-prepend">
-            <span class="input-group-text">&#160;&#160;&#160; Тема:</span>
-        </div>
-        <input type="text" class="form-control" placeholder="Тема письма">
-    </div>
-    <div class="input-group mb-3">
-        <textarea class="form-control" rows="6"></textarea>
-    </div>
-    <button type="button" class="btn btn-warning"><i class="ionicons ion-android-share"></i> Отправить</button>
-    <button @click="inbox = false" class="btn btn-outline-danger">
-        <i class="fi-x"></i> Отмена
-    </button>
-</form>
+                                <form>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">От кого:</span>
+                                        </div>
+                                        <input type="text" class="form-control" placeholder="Адрес отправителя" value="info@defina.ru">
+                                    </div>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">&#160;&#160;&#160; Кому:</span>
+                                        </div>
+                                        <input type="text" class="form-control" placeholder="Адрес получателя" :value="mail.email">
+                                    </div>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">&#160;&#160;&#160; Тема:</span>
+                                        </div>
+                                        <input type="text" class="form-control" placeholder="Тема письма">
+                                    </div>
+                                    <div class="input-group mb-3">
+                                        <textarea class="form-control" rows="6">Здравствуйте, {{ mail.name }}</textarea>
+                                    </div>
+                                    <button type="button" class="btn btn-warning"><i class="ionicons ion-android-share"></i> Отправить</button>
+                                    <button @click="inbox = false" class="btn btn-outline-danger">
+                                        <i class="fi-x"></i> Отмена
+                                    </button>
+                                </form>
                             </div>
                         </template>
                         
                         <template v-else>
-<div class="btn-group btn-group-lg float-right">
-    <button type="button" class="btn btn-default"><i class="ionicons ion-android-star-outline"></i></button>
-    <button type="button" class="btn btn-default"><i class="ionicons ion-android-share"></i></button>
-    <div class="btn-group">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-            <i class="ionicons ion-android-more-vertical"></i>
-        </button>
-        <div class="dropdown-menu dropdown-menu-right">
-            <a class="dropdown-item" href="#">Tablet</a>
-            <a class="dropdown-item" href="#">Smartphone</a>
-        </div>
-    </div>
-</div>                            
+                            <div class="btn-group btn-group-lg float-right">
+                                <button type="button" class="btn btn-default" @click="starVisible = !starVisible" v-html="clickBtnStar"></button>
+                                <button type="button" class="btn btn-default" @click="inbox = true"><i class="ionicons ion-android-share"></i></button>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                        <i class="ionicons ion-android-more-vertical" style="font-size: 25px;margin-top: 6px;"></i>
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-right">
+                                        <a class="dropdown-item" href="#">Tablet</a>
+                                        <a class="dropdown-item" href="#">Smartphone</a>
+                                    </div>
+                                </div>
+                            </div>                            
 <h6 class="pt-3 pl-3 pr-3 pb-0">{{ mail.text }} 
     &#160; <i class="fi-mail text-primary"></i> &#160; 
     <span class="badge badge-light">Входящие <i class="ionicons ion-android-close"></i></span></h6>
@@ -92,6 +107,7 @@
                                 </div>
                             </div>
                             <div class="d-block btn-block p-3">
+                                <hr/>
                                 <span v-html="mail.message"></span>
                                 <hr/>
                                 <button @click="inbox = true" class="btn btn-outline-light text-dark">
@@ -129,7 +145,9 @@
                 mail: mails[0],
                 selectMailCell: null,
                 inbox: false,
-                isActive: false
+                isActive: false,
+                starVisible: false,
+                searth: ''
             },
             methods: {
                 selectMail: function(index)
@@ -138,10 +156,17 @@
                     this.selectMailCell = index,
                     this.isActive = index
                 }
+            },
+            computed: {
+                clickBtnStar() {
+                    return this.starVisible ? '<i class="ionicons ion-android-star text-warning"></i>' : '<i class="ionicons ion-android-star-outline"></i>';
+                },
+                filtredMail(){
+                    return this.mails.filter(mail => {
+                        return mail.email.indexOf(this.searth) > -1 || mail.name.indexOf(this.searth) > -1;
+                    });
+                }
             }
-//            components: {
-//
-//            }
         });
     </script>
 </body>
