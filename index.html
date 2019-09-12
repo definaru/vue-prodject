@@ -82,7 +82,7 @@
                         </template>
                         
                         <template v-else>
-                            <div v-if="mail">
+                            <template v-if="mail.id">
                             <div class="btn-group btn-group-lg float-right">
                                 <button type="button" class="btn btn-default" @click="clickBtnStar" v-html="iconStarNow"></button>
                                 <button type="button" class="btn btn-default" @click="inbox = true"><i class="ionicons ion-android-share"></i></button>
@@ -119,9 +119,19 @@
                                 <button class="btn btn-outline-light text-dark">
                                     <i class="fi-arrow-right"></i> переслать
                                 </button>
-                            </div>   
-                            </div>
-                        </template>
+                            </div> 
+							</template>	
+						<template v-else>
+							<div class="p-3 text-center"> 
+								<div class="d-flex flex-column">
+									<div class="p-2"><i class="fi-mail text-primary" style="font-size: 150px;opacity: 0.1;"></i></div>
+									<div class="p-2"><strong>Выберите сообщение из списка</strong></div>
+								</div>
+							</div>
+						</template>
+                        
+						</template>
+						
                     </div>
                 </div>
             </div>
@@ -241,7 +251,7 @@
                         date: '23.12.2020 в 20:00'
                     }
                 ];
-                this.mail = this.mails[0];
+                this.mail = this.mails; // [0]
             }
         });
     </script>
